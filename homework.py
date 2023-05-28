@@ -154,9 +154,5 @@ if __name__ == '__main__':
 
     for workout_type, data in packages:
         training = read_package(workout_type, data)
-        if (workout_type != 'SWM'
-           and workout_type != 'RUN' and workout_type != 'WLK'):
-            print('Неверный тип тренировки')
-            break
 
         main(training)
