@@ -17,7 +17,7 @@ class InfoMessage:
                ' Потрачено ккал: {calories:0.3f}.')
 
     def get_message(self):
-        return (self.MESSAGE.format(**asdict(self)))
+        return self.MESSAGE.format(**asdict(self))
 
 
 class Training:
@@ -52,14 +52,16 @@ class Training:
         """Вернуть информационное сообщение о выполненной тренировке."""
         return InfoMessage(self.__class__.__name__,
                            self.duration,
-                           self.get_distance(), self.get_mean_speed(),
+                           self.get_distance(),
+                           self.get_mean_speed(),
                            self.get_spent_calories())
 
 
 class Running(Training):
+    """Тренировка: бег."""
     CALORIES_MEAN_SPEED_MULTIPLIER: int = 18
     CALORIES_MEAN_SPEED_SHIFT: float = 1.79
-    """Тренировка: бег."""
+
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
         return ((self.CALORIES_MEAN_SPEED_MULTIPLIER * self.get_mean_speed()
@@ -69,12 +71,12 @@ class Running(Training):
 
 
 class SportsWalking(Training):
+    """Тренировка: спортивная ходьба."""
     CALORIES_MEAN_SPEED_SPORTS_WALKING: float = 0.035
     CALORIES_MEAN_SPEED_SPORTS_WALKING_2: float = 0.029
     KMH_IN_MS: float = 0.278
     SM_IN_M: int = 100
 
-    """Тренировка: спортивная ходьба."""
     def __init__(self,
                  action: int,
                  duration: float,
@@ -86,9 +88,7 @@ class SportsWalking(Training):
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-
-        return ((
-                self.CALORIES_MEAN_SPEED_SPORTS_WALKING
+        return ((self.CALORIES_MEAN_SPEED_SPORTS_WALKING
                 * self.weight
                 + (self.get_mean_speed() * self.KMH_IN_MS)**2
                 / self.height * self.SM_IN_M
@@ -99,10 +99,11 @@ class SportsWalking(Training):
 
 
 class Swimming(Training):
+    """Тренировка: плавание."""
     LEN_STEP: float = 1.38
     COEF_1: float = 1.1
     COEF_2: int = 2
-    """Тренировка: плавание."""
+
     def __init__(self,
                  action: int,
                  duration: float,
@@ -133,6 +134,8 @@ def read_package(workout_type: Type[Training],
         'RUN': Running,
         'WLK': SportsWalking
     }
+    if workout_type not in workout:
+        raise ValueError('Неверный тип тренировки')
     return workout[workout_type](*data)
 
 
